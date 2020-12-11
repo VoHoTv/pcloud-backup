@@ -52,7 +52,7 @@ class Pcloud_Backup_Backup_Page {
             'manage_options',
             'pcloud-backup',
             array( $this, 'render_backup_page_content'),
-            'dashicons-cloud-saved',
+            'dashicons-cloud-saved'
         );
 
         add_submenu_page(
@@ -61,7 +61,7 @@ class Pcloud_Backup_Backup_Page {
             __('Backup', 'pcloud-backup'),
             'manage_options',
             'pcloud-backup',
-            array( $this, 'render_backup_page_content'),
+            array( $this, 'render_backup_page_content')
         );
 
     }
