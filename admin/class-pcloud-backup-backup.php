@@ -2,37 +2,16 @@
 
 class Pcloud_Backup_Backup {
 
-    private $pcloud_file;
-    
-	private $zip;
+	public function __construct( Pcloud_Backup_Backup_Request $backup_request ) {
 
-	public function __construct( pCloud\File $pcloud_file, ZipArchive $zip ) {
-
-		$this->pcloud_file = $pcloud_file;
-		$this->zip = $zip;
+        $this->backup_request = $backup_request;
 
     }
 
     public function create_backup()
     {   
-        $location = $this->get_backup_file_location();
-
-        $this->zip->open($location, ZipArchive::CREATE | ZipArchive::OVERWRITE);
-
-        if(isset($_POST['pcloud_backup_files'])) {
-            $this->create_wp_content_backup();
-        }
-
-        if(isset($_POST['pcloud_backup_database'])) {
-            $database_location = $this->create_database_backup();
-        }
-
-        $this->zip->close();
-
-        $this->upload_backup($location, $_POST['folder_id'] ?? 0);
-
-        unlink($location);
-        unlink($database_location);
+        check_ajax_referer('backup_nonce', 'nonce');
+        $this->backup_request->data(array('folder_id' => $_POST['folder_id'], 'pcloud_backup_files' => $_POST['pcloud_backup_files'] ?? null, 'pcloud_backup_database' => $_POST['pcloud_backup_database'] ?? null))->dispatch();
 
         echo json_encode(array());
         wp_die();

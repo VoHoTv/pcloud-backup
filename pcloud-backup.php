@@ -48,6 +48,11 @@ require_once plugin_dir_path( __FILE__ ) . 'lib/pCloud/autoload.php';
 require_once plugin_dir_path( __FILE__ ) . 'lib/MySQLDump.php';
 
 /**
+ * Require the wp-async-request.php class.
+ */
+require_once plugin_dir_path( __FILE__ ) . 'lib/wp-async-request.php';
+
+/**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-pcloud-backup-activator.php
  */

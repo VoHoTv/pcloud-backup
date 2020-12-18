@@ -76,8 +76,9 @@ class Pcloud_Backup_Backup_Page {
 		wp_enqueue_script( 'smart-wizard', plugin_dir_url( __FILE__ ) . 'js/jquery.smartWizard.min.js', array( 'jquery' ), false, false );
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/pcloud-backup-admin.js', array( 'jquery' ), $this->version, false );
 
-        wp_localize_script($this->plugin_name, 'pCloudBackup', array(
+        wp_localize_script($this->plugin_name, 'pcloudBackup', array(
             'ajaxurl' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('backup_nonce'),
         ));
     }
 
@@ -126,17 +127,15 @@ class Pcloud_Backup_Backup_Page {
                 </label>
             </div>
             <div id="step-3" class="tab-pane" role="tabpanel">
+                <input type="text" id="folder-name">
+                <input class="button-secondary" id="add-folder" type="button" value="<?php _e( 'Add Folder', 'pcloud-backup' ); ?>" />
                 <div id="tree">
                 </div>
             </div>
             <div id="step-4" class="tab-pane" role="tabpanel">
-                <div class="sk-folding-cube">
-                    <div class="sk-cube1 sk-cube"></div>
-                    <div class="sk-cube2 sk-cube"></div>
-                    <div class="sk-cube4 sk-cube"></div>
-                    <div class="sk-cube3 sk-cube"></div>
-                </div>
-                <?php echo sprintf(__('Lay back and relax while we make the backup.', 'pcloud-backup')); ?>
+                <img src="<?php echo esc_url( plugin_dir_url( __FILE__ ) ) . 'images/success-icon.jpg'?>" alt="Success Icon" class="success-icon">
+                <p><?php _e('Your backup is being created and uploaded. Depending on the size of your website this can take anywhere from a few seconds to a few minutes. You can safely close this page.', 'pcloud-backup'); ?></p>
+                <p><?php _e('Want automatic backups? Consider upgrading to', 'pcloud-backup'); ?> <a href="https://www.josselynjayant.fr/pcloud-backup-wordpress-plugin/"><?php _e('pCloud Backup Pro', 'pcloud-backup'); ?></a>.</p>
             </div>
             </div>
         </div>

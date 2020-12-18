@@ -2,6 +2,27 @@
 
     $(function() {
 
+        /**
+         * Initialize
+         */
+
+        let $tree = $("#tree").fancytree({
+            source: $.ajax({
+                url: pcloudBackup.ajaxurl,
+                data: { action : 'get_root_folders'},
+                dataType: 'json',
+            }),
+
+            lazyLoad: function(event, data) {
+                let node = data.node;
+
+                data.result = {
+                    url: pcloudBackup.ajaxurl,
+                    data: {key: node.key, 'action': 'get_child_folders'}
+                }
+            }
+        });
+        
         $('#pcloud-backup-wizard').smartWizard({
             theme: 'dots',
             autoAdjustHeight: false,
@@ -14,22 +35,30 @@
             },
         });
 
-        let $tree = $("#tree").fancytree({
-            // Initial node data that sets 'lazy' flag on some leaf nodes
-            source: $.ajax({
-                url: pCloudBackup.ajaxurl,
-                data: { action : 'get_root_folders'},
+        /**
+         * Event Listeners
+         */
+
+        $('#add-folder').on('click', function() {
+
+            let parentFolder = $tree.fancytree('getTree').getActiveNode();
+            
+            $.ajax({
+                type: 'POST',
+                url: pcloudBackup.ajaxurl,
+                data: {
+                    'action'      : 'create_folder',
+                    'folder_name' : $('#folder-name').val(),
+                    'parent_folder_id' : parentFolder.key,
+                },
                 dataType: 'json',
-            }),
-
-            lazyLoad: function(event, data) {
-                var node = data.node;
-
-                data.result = {
-                    url: pCloudBackup.ajaxurl,
-                    data: {key: node.key, 'action': 'get_child_folders'}
+                success: function (response) {
+                    let rootNode = $tree.fancytree('getTree').getNodeByKey(parentFolder.key);
+                    $('#folder-name').val('');
+                    rootNode.resetLazy();
+                    rootNode.setExpanded(true);
                 }
-            }
+            });
         });
 
         $('#pcloud-backup-wizard').on('stepContent', function(e, anchorObject, stepIndex, stepDirection) {
@@ -37,6 +66,7 @@
 
             data = {
                 action: 'upload_backup',
+                nonce: pcloudBackup.nonce,
                 folder_id: $('#tree').fancytree('getTree').getActiveNode().key,
             };
 
@@ -50,11 +80,11 @@
 
             $.ajax({
                 type: 'POST',
-                url: pCloudBackup.ajaxurl,
+                url: pcloudBackup.ajaxurl,
                 data: data,
                 dataType: 'json',
                 success: function (response) {
-                    $('#pcloud-backup-wizard').smartWizard('reset');
+                    // $('#pcloud-backup-wizard').smartWizard('reset');
                 }
             });
         });

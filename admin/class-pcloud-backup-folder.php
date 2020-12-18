@@ -1,18 +1,10 @@
 <?php
 
-class Pcloud_Backup_Ajax_Folders {
-
-	private $pcloud_folder;
-
-	public function __construct( pCloud\Folder $pcloud_folder ) {
-
-		$this->pcloud_folder = $pcloud_folder;
-
-    }
+class Pcloud_Backup_Folder extends pCloud\Folder {
 
     public function get_root_folders()
     {
-        $files = $this->pcloud_folder->getContent(0);
+        $files = $this->getContent(0);
 
         echo json_encode(
             array_map(function($file) {
@@ -35,7 +27,7 @@ class Pcloud_Backup_Ajax_Folders {
 
     public function get_child_folders()
     {
-        $files = $this->pcloud_folder->getContent(intval($_GET['key']));
+        $files = $this->getContent(intval($_GET['key']));
 
         echo json_encode(
             array_map(function($file) {
@@ -52,6 +44,16 @@ class Pcloud_Backup_Ajax_Folders {
             }, $files)
         );
 
+        wp_die();
+    }
+
+    public function create_folder() {
+
+        $folder_name = sanitize_text_field($_POST['folder_name']);
+
+        $folder_id = $this->create($folder_name, intval($_POST['parent_folder_key']));
+
+        echo json_encode(array('folderId' => $folder_id, 'folderName' => $folder_name));
         wp_die();
     }
 

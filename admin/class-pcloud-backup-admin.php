@@ -65,61 +65,15 @@ class Pcloud_Backup_Admin {
 	 */
 	private function load_dependencies() {
 
-        require_once plugin_dir_path( dirname( __FILE__ ) ) .  'admin/class-pcloud-backup-ajax-folders.php';
+        require_once plugin_dir_path( dirname( __FILE__ ) ) .  'admin/class-pcloud-backup-folder.php';
 
         require_once plugin_dir_path( dirname( __FILE__ ) ) .  'admin/class-pcloud-backup-backup.php';
+
+        require_once plugin_dir_path( dirname( __FILE__ ) ) .  'admin/class-pcloud-backup-backup-request.php';
         
         require_once plugin_dir_path( dirname( __FILE__ ) ) .  'admin/class-plcoud-backup-plugin-settings.php';
         
 		require_once plugin_dir_path( dirname( __FILE__ ) ) .  'admin/class-pcloud-backup-backup-page.php';
 
     }
-
-    public function upload_backup()
-    {   
-        $access_token = get_option('pcloud_backup_access_token');
-        $locationid = get_option('pcloud_backup_Location_id');
-    
-        $pCloudApp = new pCloud\App();
-        $pCloudApp->setAccessToken($access_token);
-        $pCloudApp->setLocationId($locationid);
-
-        $pcloudFile = new pCloud\File($pCloudApp);
-
-        // Get real path for our folder
-        $rootPath = realpath(WP_CONTENT_DIR);
-
-        // Initialize archive object
-        $zip = new ZipArchive();
-        $location = get_temp_dir().get_bloginfo('name').' backup - '.date('d-m-Y').'.zip';
-        $zip->open($location, ZipArchive::CREATE | ZipArchive::OVERWRITE);
-
-        $files = new RecursiveIteratorIterator(
-        new RecursiveDirectoryIterator($rootPath),
-        RecursiveIteratorIterator::LEAVES_ONLY
-        );
-
-        foreach ($files as $name => $file)
-        {
-            if (!$file->isDir()) {
-
-                $filePath = $file->getRealPath();
-
-                $relativePath = substr($filePath, strlen($rootPath) + 1);
-
-                $zip->addFile($filePath, $relativePath);
-            }
-        }
-
-        $dump = new MySQLDump(new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME));
-        // $dump->save(plugin_dir_path(__FILE__).'export.sql');
-
-        $zip->close();
-
-        $fileMetadata = $pcloudFile->upload($location, $_POST['folder_id']);
-
-        echo json_encode(array());
-        wp_die();
-    }
-
 }

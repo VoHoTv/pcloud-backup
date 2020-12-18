@@ -153,11 +153,12 @@ class Pcloud_Backup {
         $pcloud_app->setAccessToken(get_option('pcloud_backup_access_token'));
         $pcloud_app->setLocationId(get_option('pcloud_backup_Location_id'));
 
-        $pcloud_backup_ajax_folders = new Pcloud_Backup_Ajax_Folders(new pCloud\Folder($pcloud_app));
-        $pcloud_backup_backup = new Pcloud_Backup_Backup(new pCloud\File($pcloud_app), new ZipArchive());
-
-        $this->loader->add_action('wp_ajax_get_root_folders', $pcloud_backup_ajax_folders, 'get_root_folders');
-        $this->loader->add_action('wp_ajax_get_child_folders', $pcloud_backup_ajax_folders, 'get_child_folders');
+        $pcloud_backup_folders = new Pcloud_Backup_Folder($pcloud_app);
+        $pcloud_backup_backup = new Pcloud_Backup_Backup(new Pcloud_Backup_Backup_Request(new pCloud\File($pcloud_app), new ZipArchive()));
+        
+        $this->loader->add_action('wp_ajax_create_folder', $pcloud_backup_folders, 'create_folder');
+        $this->loader->add_action('wp_ajax_get_root_folders', $pcloud_backup_folders, 'get_root_folders');
+        $this->loader->add_action('wp_ajax_get_child_folders', $pcloud_backup_folders, 'get_child_folders');
 
         $this->loader->add_action('wp_ajax_upload_backup', $pcloud_backup_backup, 'create_backup');
 
